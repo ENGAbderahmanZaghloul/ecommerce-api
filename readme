@@ -1,0 +1,93 @@
+                ######################################## Authentication ############################################
+# use App\Models\User; // استدعاء موديل المستخدم للتعامل مع جدول الـ users
+# use Illuminate\Http\Request; // استدعاء كلاس الـ Request للوصول لبيانات الطلب (inputs)
+# use Illuminate\Support\Facades\Hash; // استدعاء Facade الـ Hash لتشفير كلمات المرور
+# use Illuminate\Support\Facades\Auth; // (أقل استخداماً في API Sanctum ولكن ممكن) لبعض وظائف الـ authentication المدمجة
+# use Illuminate\Validation\ValidationException; // استدعاء هذا الـ Exception لإظهار أخطاء الـ validation يدوياً
+
+# class AuthController extends Controller
+# {
+#     /**
+#      * Handle user registration.
+#      * معالجة تسجيل المستخدمين الجدد.
+#      */
+#     public function register(Request $request)
+#     {
+#         // 1. Validation (التحقق من صحة البيانات المدخلة)
+#         // هنا بنستخدم validate() method المباشر من الـ Request Object.
+#         $request->validate([
+#             validation rules
+#           ])
+
+#         // 2. Create User (إنشاء المستخدم في قاعدة البيانات)
+#         // بنستخدم موديل الـ User لإنشاء سجل جديد في جدول الـ users.
+#         $user = User::create([
+#                create  with request validation
+#         ]);
+
+#         // 3. Optional: Generate Token Immediately (اختياري: توليد Token مباشرة بعد التسجيل)
+#         // الجزء د  حالياً. لو عايز المستخدم يسجل دخول تلقائي بعد التسجيل،   .
+
+#         // 4. Return Response (إرجاع الاستجابة)
+#         // بنرجع JSON response للمستخدم مع رسالة نجاح.
+#         // الـ 201 هو HTTP status code لـ "Created" (تم إنشاء المورد بنجاح).
+#     }
+
+#     /**
+#      * Handle user login and token generation.
+#      * معالجة تسجيل دخول المستخدم وتوليد الـ Token.
+#      */
+#     public function login(Request $request)
+#     {
+#         // 1. Validation (التحقق من صحة البيانات المدخلة)
+#         
+
+#         // 2. Find User (البحث عن المستخدم)
+#         // بنبحث عن المستخدم في قاعدة البيانات باستخدام الإيميل.
+
+
+#         // 3. Verify Credentials (التحقق من بيانات الاعتماد)
+#         // بنتحقق من وجود المستخدم، ثم بنقارن كلمة المرور المدخلة (بعد تشفيرها) بكلمة المرور المشفرة المخزنة في قاعدة البيانات.
+#         // Hash::check() وظيفتها مقارنة كلمة مرور نصية بكلمة مرور مشفرة.
+#        
+
+#         // 4. Optional: Revoke Old Tokens (اختياري: إلغاء الـ Tokens القديمة)
+#         // لو فعلت السطر ده، أي Token كان المستخدم ده عامله قبل كده (على أي جهاز تاني) هيتلغي.
+#         // ده بيضمن إن المستخدم يكون عنده Token نشط واحد بس في كل مرة يسجل دخول.
+#         // $user->tokens()->delete(); // بيحذف كل الـ personal access tokens المرتبطة بالمستخدم ده.
+
+#         // 5. Generate New Token (توليد Token جديد)
+#         // هنا بنستخدم createToken() method اللي بيوفره Sanctum بفضل الـ HasApiTokens trait.
+#         // 'auth_token' هو اسم الـ token (يمكن استخدامه للتعرف على مصدر الـ token).
+#         // plainTextToken هي القيمة النصية للـ token اللي بنرجعها للـ Frontend عشان يستخدمها في الطلبات الجاية.
+
+
+#         // 6. Return Response (إرجاع الاستجابة)
+#         // بنرجع JSON response مع رسالة نجاح، الـ access_token، ونوعه، وبيانات المستخدم.
+#         return response()->json([
+#             'message' => 'Logged in successfully!',
+#             'access_token' => $token,
+#             'token_type' => 'Bearer', // ده البروتوكول القياسي لـ OAuth 2.0. الـ Frontend هيبعت الـ token في الـ Header كـ "Authorization: Bearer [your_token]"
+#             'user' => $user, // بنرجع بيانات المستخدم عشان الـ Frontend يقدر يعرضها أو يخزنها.
+#         ]);
+#     }
+
+#     /**
+#      * Handle user logout (revoke current token).
+#      * معالجة تسجيل خروج المستخدم (إلغاء الـ Token الحالي).
+#      */
+#     public function logout(Request $request)
+#     {
+#         // 1. Revoke Current Token (إلغاء الـ Token الحالي)
+#         // $request->user() بيرجع موديل المستخدم اللي مسجل دخول حالياً (بواسطة الـ Token اللي بعته).
+#         // currentAccessToken() بترجع الـ Token اللي استخدم في الطلب الحالي.
+#         // delete() بيحذف الـ Token ده من جدول الـ personal_access_tokens في قاعدة البيانات.
+#         // ده بيضمن إن الـ Token ده مش هيشتغل تاني.
+#         $request->user()->currentAccessToken()->delete();
+
+#         // 2. Return Response (إرجاع الاستجابة)
+#         return response()->json([
+#             'message' => 'Logged out successfully!'
+#         ]);
+#     }
+# }
